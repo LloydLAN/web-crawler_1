@@ -18,28 +18,7 @@ namespace web_crawler_1
     {
         
         static void Main(string[] args)
-        {
-            /*
-            String FilePath = "";
-            DirectoryInfo dir = new DirectoryInfo(System.Environment.CurrentDirectory);
-            try
-            {
-                // Open the text file using a stream reader.
-                StreamReader sr = new StreamReader(dir.Parent.Parent.Parent.FullName + "\\FilePathConfig.txt");
-                {
-                    // Read the stream as a string, and write the string to the console.
-                    FilePath = sr.ReadToEnd();
-                    Console.WriteLine(FilePath);
-                }
-            }
-            catch (IOException e)
-            {
-                Console.WriteLine("The file could not be read:");
-                Console.WriteLine(e.Message);
-            }
-            */
-
-            
+        {       
             Console.WriteLine("請輸入目標股號：");
             String tartgetStock = Console.ReadLine();
             Console.WriteLine();
