@@ -8,6 +8,8 @@ using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using System.Data;
 using System.IO;
+using System.Windows;
+
 
 
 namespace web_crawler_1
@@ -17,6 +19,27 @@ namespace web_crawler_1
         
         static void Main(string[] args)
         {
+            /*
+            String FilePath = "";
+            DirectoryInfo dir = new DirectoryInfo(System.Environment.CurrentDirectory);
+            try
+            {
+                // Open the text file using a stream reader.
+                StreamReader sr = new StreamReader(dir.Parent.Parent.Parent.FullName + "\\FilePathConfig.txt");
+                {
+                    // Read the stream as a string, and write the string to the console.
+                    FilePath = sr.ReadToEnd();
+                    Console.WriteLine(FilePath);
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine("The file could not be read:");
+                Console.WriteLine(e.Message);
+            }
+            */
+
+            
             Console.WriteLine("請輸入目標股號：");
             String tartgetStock = Console.ReadLine();
             Console.WriteLine();
@@ -25,8 +48,10 @@ namespace web_crawler_1
             Console.WriteLine("股利政策");
             Console.WriteLine();
             Get_Company_Dividend(tartgetStock);
+            
             Console.WriteLine("按任意鍵結束....");
             Console.ReadKey();
+            
         }
 
         // 抓取ID公司名稱與產業別
@@ -95,7 +120,6 @@ namespace web_crawler_1
             String UrlCompanyDividend = "https://goodinfo.tw/StockInfo/StockDividendPolicy.asp?STOCK_ID=";
             doc = web.Load(UrlCompanyDividend + strID);
 
-            String CompanyDividendData;
             // 取得表格內容
             String XpathDividendData = "/html/body/table[2]/tbody/tr/td[3]/div[2]/div/div/table/tbody[1]/tr";
             nodes = doc.DocumentNode.SelectNodes(Regex.Replace(XpathDividendData, "/tbody([[]\\d[]])?", ""));
@@ -116,17 +140,6 @@ namespace web_crawler_1
                         tds.Add(td); 
                 }
 
-                // Console.WriteLine("tds.Count: " + tds.Count);
-                /*
-                for (int i = 0; i < tds.Count; i++)
-                {
-                    if(tds[i].HasChildNodes == false)
-                        CompanyDividendData = "0"; 
-                    else
-                        CompanyDividendData = tds[i].InnerText;
-                    Console.WriteLine(CompanyDividendData);
-                }
-                */
                 Object[] row = new Object[] {
                     tds[0].InnerText, tds[1].InnerText, tds[2].InnerText, tds[3].InnerText, tds[4].InnerText, tds[5].InnerText, tds[6].InnerText, tds[7].InnerText, // 
                     tds[13].InnerText, tds[14].InnerText, tds[15].InnerText, tds[16].InnerText, tds[17].InnerText, tds[18].InnerText };
@@ -137,12 +150,34 @@ namespace web_crawler_1
                 DividendTable.Rows.Add(row);
             }
 
-            TableSample.ShowTable(DividendTable);
-            SaveToCSV(DividendTable, "E:\\side project\\" + strID + "-DividendTable.csv");
+            ShowTable(DividendTable);
+            String DepositoryPath = "";
+            DirectoryInfo dir = new DirectoryInfo(System.Environment.CurrentDirectory);
+            try
+            {
+                // Open the text file using a stream reader.
+                StreamReader sr = new StreamReader(dir.Parent.Parent.Parent.FullName + "\\DepositoryPathConfig.txt");
+                {
+                    // Read the stream as a string.
+                    
+                    DepositoryPath = sr.ReadToEnd();
+                    Console.WriteLine("DepositoryPath: " + DepositoryPath);
+                    SaveToCSV(DividendTable, DepositoryPath + "\\" + strID + ".csv");
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine("The file could not be read:");
+                Console.WriteLine(e.Message);
+            }
+
+
+            
         }
 
         public static void SaveToCSV(DataTable oTable, string FilePath)
         {
+            Console.WriteLine("FilePath: " + FilePath);
             string data = "";
             StreamWriter wr = new StreamWriter(FilePath, false, System.Text.Encoding.UTF8);
             foreach (DataColumn column in oTable.Columns)
@@ -167,6 +202,30 @@ namespace web_crawler_1
 
             wr.Dispose();   // 釋放由 TextWriter 物件使用的所有資源。
             wr.Close();     // 關閉目前的 StreamWriter 物件和基礎資料流。
+        }
+
+        public static void ShowTable(DataTable table)
+        {
+            foreach (DataColumn col in table.Columns)
+            {
+                Console.Write("{0,-14}", col.ColumnName);
+            }
+            Console.WriteLine();
+
+            foreach (DataRow row in table.Rows)
+            {
+                foreach (DataColumn col in table.Columns)
+                {
+                    if (col.DataType.Equals(typeof(DateTime)))
+                        Console.Write("{0,-14:d}", row[col]);
+                    else if (col.DataType.Equals(typeof(Decimal)))
+                        Console.Write("{0,-14:C}", row[col]);
+                    else
+                        Console.Write("{0,-14}", row[col]);
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine();
         }
     }
 }
