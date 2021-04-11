@@ -8,7 +8,6 @@ using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using System.Data;
 using System.IO;
-using System.Windows;
 
 
 
@@ -18,7 +17,7 @@ namespace web_crawler_1
     {
         
         static void Main(string[] args)
-        {       
+        {
             Console.WriteLine("請輸入目標股號：");
             String tartgetStock = Console.ReadLine();
             Console.WriteLine();
@@ -52,7 +51,7 @@ namespace web_crawler_1
             doc = web.Load(UrlCompanyInfo + strID);
 
             // 公司名稱
-            nodes = doc.DocumentNode.SelectNodes(Regex.Replace(XpathCompanyName, "/tbody([[]\\d[]])?",""));     // Why?
+            nodes = doc.DocumentNode.SelectNodes(Regex.Replace(XpathCompanyName, "/tbody([[]\\d[]])?",""));
             CompanyName = nodes[0].ChildNodes[0].InnerText;
 
             // 產業別
@@ -135,7 +134,7 @@ namespace web_crawler_1
             try
             {
                 // Open the text file using a stream reader.
-                StreamReader sr = new StreamReader(dir.Parent.Parent.Parent.FullName + "\\DepositoryPathConfig.txt");
+                StreamReader sr = new StreamReader(dir.FullName + "\\DepositoryPathConfig.txt");
                 {
                     // Read the stream as a string.
                     
@@ -154,6 +153,7 @@ namespace web_crawler_1
             
         }
 
+        // 存為 CSV 檔
         public static void SaveToCSV(DataTable oTable, string FilePath)
         {
             Console.WriteLine("FilePath: " + FilePath);
@@ -183,6 +183,7 @@ namespace web_crawler_1
             wr.Close();     // 關閉目前的 StreamWriter 物件和基礎資料流。
         }
 
+        // 在畫面上顯示爬蟲結果
         public static void ShowTable(DataTable table)
         {
             foreach (DataColumn col in table.Columns)
